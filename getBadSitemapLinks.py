@@ -29,7 +29,7 @@ def get_urls_from_file(filename):
 def grab_canonical_from_html(html):
     """Extract the canonical URL from the given HTML document"""
     parsed_dom = BeautifulSoup(html, 'lxml')
-    return parsed_dom.find(id='canonical-link').get('href')
+    return parsed_dom.find('link', rel='canonical').get('href')
 
 def map_url_status(sitemap_url):
     """Map the given sitemap_url into a dictionary of the format
@@ -53,10 +53,9 @@ def has_bad_response_code(status):
     return status['code'] != 200
 
 def has_url_mismatch(status):
-    success_code = status['code'] == 200
     bad_canonical = status['sitemap_url'] != status['canonical_url']
 
-    return success_code and bad_canonical
+    return not has_bad_response_code(status) and bad_canonical
 
 # For each URL in the sitemap file, return a
 #   sitemap_url
