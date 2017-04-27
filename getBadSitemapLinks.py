@@ -94,4 +94,4 @@ if __name__ == "__main__":
 
     filename = sys.argv[1]
     urls = get_urls_from_file(filename)
-    get_statuses(urls)
+    get_bad_links(urls)
