@@ -7,10 +7,10 @@
 # GET and writes any responses that have a bad response code or
 # sitemap/canonical URL mismatch to a JSON file.
 
-import sys
 import re
 import json
 import xml.etree.ElementTree as ET
+from bs4 import BeautifulSoup
 
 from urllib.request import urlopen
 from urllib.error import HTTPError
@@ -28,8 +28,8 @@ def get_urls_from_file(filename):
 
 def grab_canonical_from_html(html):
     """Extract the canonical URL from the given HTML document"""
-    matches = re.search('rel="canonical" href="([^"]+)"', html)
-    return matches.group(1)
+    parsed_dom = BeautifulSoup(html, 'lxml')
+    return parsed_dom.find(id='canonical-link').get('href')
 
 def map_url_status(sitemap_url):
     """Map the given sitemap_url into a dictionary of the format
@@ -87,6 +87,8 @@ def get_bad_links(urls):
 # This file can be run as a standalone script, or as a module.
 # When run as a script, take a filename argument.
 if __name__ == "__main__":
+    import sys
+
     if len(sys.argv) != 2:
         print("Usage: ./get_bad_sitemap_links.py <sitemap xml file>")
         exit()
