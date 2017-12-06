@@ -25,26 +25,42 @@ def get_filename_from_sitemap(sitemap_url):
         return matches.group(1)
     return None
 
-sitemap_index_url = 'https://www.ifixit.com/sitemap.xml'
+def validate_sitemap_index():
+    sitemap_index_url = 'https://www.ifixit.com/sitemap.xml'
 
-with urlopen(sitemap_index_url) as res:
-    xml = res.read().decode('utf-8')
+    with urlopen(sitemap_index_url) as res:
+        xml = res.read().decode('utf-8')
 
-tree = ET.fromstring(xml)
-namespaces = {'sitemap': 'http://www.sitemaps.org/schemas/sitemap/0.9'}
+    tree = ET.fromstring(xml)
+    namespaces = {'sitemap': 'http://www.sitemaps.org/schemas/sitemap/0.9'}
 
-sitemap_urls = list(map(lambda url_element: url_element.text,
-        tree.findall("./sitemap:sitemap/sitemap:loc", namespaces)))
+    sitemap_urls = list(map(lambda url_element: url_element.text,
+            tree.findall("./sitemap:sitemap/sitemap:loc", namespaces)))
+    print(sitemap_urls)
 
-# Download sitemap files
-for url in sitemap_urls:
-    get_sitemap(url)
+def validate_sitemap():
+    sitemap_index_url = 'https://www.ifixit.com/sitemap.xml'
 
-# Get file names from urls
-sitemap_filenames = list(map(get_filename_from_sitemap, sitemap_urls))
+    with urlopen(sitemap_index_url) as res:
+        xml = res.read().decode('utf-8')
 
-# Find all urls in the sitemap XML document and write any bad links to file.
-for filename in sitemap_filenames:
-    print("Getting bad links for " + filename + " sitemap")
-    urls = getBadSitemapLinks.get_urls_from_file(filename)
-    getBadSitemapLinks.get_bad_links(urls)
+    tree = ET.fromstring(xml)
+    namespaces = {'sitemap': 'http://www.sitemaps.org/schemas/sitemap/0.9'}
+
+    sitemap_urls = list(map(lambda url_element: url_element.text,
+            tree.findall("./sitemap:sitemap/sitemap:loc", namespaces)))
+
+    # Download sitemap files
+    for url in sitemap_urls:
+        get_sitemap(url)
+
+    # Get file names from urls
+    sitemap_filenames = list(map(get_filename_from_sitemap, sitemap_urls))
+
+    # Find all urls in the sitemap XML document and write any bad links to file.
+    for filename in sitemap_filenames:
+        print("Getting bad links for " + filename + " sitemap")
+        urls = getBadSitemapLinks.get_urls_from_file(filename)
+        getBadSitemapLinks.get_bad_links(urls)
+
+validate_sitemap()
